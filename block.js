@@ -3,17 +3,19 @@
  * Generates and Mine new Blocks
  */
 
-const { GENESIS_DATA } = require('./config');
+const { GENESIS_DATA, MINE_RATE } = require('./config');
 const cryptoHash = require('./crypto-hash');
 
 class Block {
     //make the param an object to allow passing in the params 
     //in any order
-    constructor({ timestamp, lastHash, hash, data }) {
+    constructor({ timestamp, lastHash, hash, data, nounce, difficulty }) {
         this.timestamp = timestamp;
         this.lastHash = lastHash;
         this.hash = hash;
         this.data = data;
+        this.nounce = nounce;
+        this.difficulty = difficulty;
     }
 
     static genesis() {
@@ -24,15 +26,51 @@ class Block {
 
     static mineBlock({ lastBlock, data }) {
 
-        const timestamp = Date.now();
+        let hash, timestamp;
+
         const lastHash = lastBlock.hash;
+        const { difficulty } = lastBlock;
+
+        let nounce = 0;
+
+        //block will only be mined when the difficulty is achieved
+        do {
+            //increase the nounce if current nounce didn't achieve
+            //the difficulty
+            nounce++;
+
+            //so timestamp will be accurate, generae the timestamp 
+            //when the difficulty is achieved
+            timestamp = Date.now();
+
+            hash = cryptoHash(timestamp, lastHash, data, nounce, difficulty)
+
+        } while (hash.substring(0, difficulty) !== '0'.repeat(difficulty));
 
         return new this({
             timestamp,
             lastHash,
             data,
-            hash: cryptoHash(timestamp, lastHash, data)
+            difficulty,
+            nounce,
+            hash
         })
+    }
+
+    //increases difficulty when block mine time is faster
+    //than MINE_RATE and 
+    //decreases difficulty when block mine time is slower
+    //than MINE_RATE
+    static adjustDifficulty({ originalBlock, timestamp }) {
+        const { difficulty } = originalBlock;
+
+        const difference = timestamp - originalBlock.timestamp;
+
+        if (difference > MINE_RATE) {
+            return difficulty - 1;
+        }
+
+        return difficulty + 1;
     }
 }
 
