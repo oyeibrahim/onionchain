@@ -1,4 +1,4 @@
-const { GENESIS_DATA } = require('./config');
+import { GENESIS_DATA } from './config';
 
 class Block {
     //make the param an object to allow passing in the params 
@@ -25,13 +25,13 @@ class Block {
     }
 }
 
-const block1 = new Block({
-    timestamp: '01/01/01',
-    lastHash: 'onion-lastHash',
-    hash: 'onion-hash',
-    data: 'onion-data'
-});
+// const block1 = new Block({
+//     timestamp: '01/01/01',
+//     lastHash: 'onion-lastHash',
+//     hash: 'onion-hash',
+//     data: 'onion-data'
+// });
 
 // console.log('block1', block1);
 
-module.exports = Block;
+export default Block;

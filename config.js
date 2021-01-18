@@ -5,4 +5,4 @@ const GENESIS_DATA = {
     data: []
 };
 
-module.exports = { GENESIS_DATA }
+export default { GENESIS_DATA }
