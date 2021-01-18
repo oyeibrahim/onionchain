@@ -1,0 +1,14 @@
+{
+  "name": "onionchain",
+  "version": "1.0.0",
+  "description": "Proof of work Blockchain",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "author": "Oyetunji Ibrahim Abiodun",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^23.6.0"
+  }
+}
