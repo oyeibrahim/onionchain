@@ -1,10 +1,10 @@
-import Block from './block';
-import { GENESIS_DATA } from './config';
+const Block = require('./block');
+const { GENESIS_DATA } = require('./config');
 
 //test block
 describe('Block', () => {
 
-    const timestamp = 'a-date';z
+    const timestamp = 'a-date';
     const lastHash = 'onion-hash';
     const hash = 'bar-hash';
     const data = ['blockchain', 'data'];
