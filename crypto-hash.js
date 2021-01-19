@@ -5,6 +5,7 @@
 //internal function
 const crypto = require('crypto')
 
+
 //using spread operator to get any number of param and not 
 //specify the number of param this function can take explicitly
 const cryptoHash = (...inputs) => {

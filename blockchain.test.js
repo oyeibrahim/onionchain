@@ -1,5 +1,6 @@
 const Blockchain = require('./blockchain');
 const Block = require('./block');
+const cryptoHash = require('./crypto-hash');
 
 
 describe('Blockchain', () => {
@@ -65,6 +66,27 @@ describe('Blockchain', () => {
 
                     //modify for fake data
                     blockchain.chain[2].data = 'broken-data';
+
+                    expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
+
+                })
+            })
+
+            describe('and the chain contains a block with a jumped difficulty', () => {
+                it('returns false', () => {
+
+                    const lastBlock = blockchain.chain[blockchain.chain.length - 1];
+                    const lastHash = lastBlock.hash;
+                    const timestamp = Date.now();
+                    const nounce = 0;
+                    const data = [];
+                    const difficulty = lastBlock.difficulty - 3;
+
+                    const hash = cryptoHash(timestamp, lastHash, difficulty, nounce, data);
+
+                    const badBlock = new Block({timestamp, lastHash, hash, nounce, difficulty, data});
+
+                    blockchain.chain.push(badBlock);
 
                     expect(Blockchain.isValidChain(blockchain.chain)).toBe(false);
 
