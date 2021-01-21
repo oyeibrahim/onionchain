@@ -15,7 +15,7 @@ const axios = require('axios');
 
 const Blockchain = require('./blockchain');
 //pubsub
-const PubSub = require('./pubsub');
+const PubSub = require('./app/pubsub');
 
 
 const app = express();

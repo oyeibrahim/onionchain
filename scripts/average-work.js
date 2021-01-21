@@ -2,7 +2,8 @@
  * Test difficulty with hex and binary
  */
 
-const Blockchain = require('./blockchain');
+//require index.js from blockchain folder
+const Blockchain = require('../blockchain');
 
 const blockchain = new Blockchain();
 
