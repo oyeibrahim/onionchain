@@ -11,6 +11,9 @@
     "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon index.js",
     "start-redis": "redis-server --deamonize yes"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "author": "Oyetunji Ibrahim Abiodun",
   "license": "ISC",
   "devDependencies": {
@@ -21,6 +24,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "body-parser": "^1.18.3",
+    "elliptic": "^6.4.1",
     "express": "^4.16.3",
     "hex-to-binary": "^1.0.1",
     "pubnub": "^4.21.6",
