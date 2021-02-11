@@ -4,7 +4,7 @@
  */
 
 const Block = require('./block');
-const cryptoHash = require('../util/crypto-hash');
+const { cryptoHash } = require('../util');
 
 class Blockchain {
     constructor() {
@@ -43,13 +43,13 @@ class Blockchain {
 
     //check if a chain is valid
     static isValidChain(chain) {
-        
+
         //check genesis block
         if (JSON.stringify(chain[0]) !== JSON.stringify(Block.genesis())) {
             return false;
         }
-        
-        
+
+
         //check data and hash
         for (let i = 1; i < chain.length; i++) {
             const { timestamp, lastHash, hash, nounce, difficulty, data } = chain[i];
