@@ -5,6 +5,7 @@
 //v1 depends on timestamp to generate a unique ID
 //timestamp of the items mut be different
 const uuid = require('uuid/v1');
+const { verifySignature } = require('../util');
 
 class Transaction {
 
@@ -30,6 +31,28 @@ class Transaction {
             address: senderWallet.publicKey,
             signature: senderWallet.sign(outputMap)
         };
+    }
+
+    static validTransaction(transaction) {
+
+        //destructure {input, outputMap} from transaction then
+        //destructure { address, amount, signature } from input
+        const { input: { address, amount, signature }, outputMap } = transaction;
+
+        const outputTotal = Object.values(outputMap)
+            .reduce((total, outputAmount) => total + outputAmount);
+
+        if (amount !== outputTotal) {
+            console.error(`Invalid transaction from ${address}`);
+            return false;
+        }
+
+        if (!verifySignature({ publicKey: address, data: outputMap, signature })) {
+            console.error(`Invalid signature from ${address}`);
+            return false;
+        }
+
+        return true;
     }
 
 }
