@@ -14,7 +14,7 @@ const cryptoHash = (...inputs) => {
 
     //sort to make any order of input params return same hash
     //convert the string
-    hash.update(inputs.sort().toString());
+    hash.update(inputs.map(input => JSON.stringify(input)).sort().toString());
 
     return hash.digest('hex');
 }

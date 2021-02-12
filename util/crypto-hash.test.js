@@ -5,11 +5,20 @@ describe('cryptoHash()', () => {
 
     it('generates SHA-256 hash', () => {
         expect(cryptoHash('onion'))
-            .toEqual('288971671685b8da56623362c82e1ead68186c5150a35e3b35b5ef74cd7ceebc')
+            .toEqual('0937ce7e31a1da5a6765a008a54163ade6308de7a793be7a3b26d8af226dbef7')
     })
 
     it('produces the same hash with different order of the same input', () => {
         expect(cryptoHash('one', 'two', 'three'))
             .toEqual(cryptoHash('three', 'one', 'two'))
+    })
+
+    it('produces a unique hash when the properties have changed on an input', () => {
+        const onion = {};
+        const originalHash = cryptoHash(onion);
+
+        onion['a'] = 'a';
+
+        expect(cryptoHash(onion)).not.toEqual(originalHash)
     })
 })
