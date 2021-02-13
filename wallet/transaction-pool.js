@@ -10,6 +10,11 @@ class TransactionPool {
         this.transactionMap = {};
     }
 
+    //hard clear the whole transaction pool
+    clear() {
+        this.transactionMap = {};
+    }
+
     setTransaction(transaction) {
         this.transactionMap[transaction.id] = transaction;
     }
@@ -24,10 +29,26 @@ class TransactionPool {
         return transactions.find(transaction => transaction.input.address === inputAddress)
     }
 
-    validTransactions(){
+    validTransactions() {
         return Object.values(this.transactionMap).filter(
-            transaction=>Transaction.validTransaction(transaction)
+            transaction => Transaction.validTransaction(transaction)
         );
+    }
+
+    //clear confirmed transaction now in a block from the 
+    //transaction pool
+    clearBlockchainTransactions({ chain }) {
+
+        //start at one to omit the genesis block
+        for (let i = 1; i < chain.length; i++) {
+            const block = chain[i];
+            
+            for (let transaction of block.data) {
+                if(this.transactionMap[transaction.id]){
+                    delete this.transactionMap[transaction.id];
+                }
+            }
+        }
     }
 }
 

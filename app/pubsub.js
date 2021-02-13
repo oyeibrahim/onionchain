@@ -37,7 +37,11 @@ class PubSub {
             //if new message on the Blockchain then call replaceChain
             //to deal with it
             case CHANNELS.BLOCKCHAIN:
-                this.blockchain.replaceChain(parsedMessage);
+                this.blockchain.replaceChain(parsedMessage, () => {
+                    this.transactionPool.clearBlockchainTransactions({
+                        chain: parsedMessage
+                    });
+                });
                 break;
 
             case CHANNELS.TRANSACTION:

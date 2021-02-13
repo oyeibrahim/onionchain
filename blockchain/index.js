@@ -5,6 +5,7 @@
 
 const Block = require('./block');
 const { cryptoHash } = require('../util');
+const { on } = require('nodemon');
 
 class Blockchain {
     constructor() {
@@ -23,7 +24,7 @@ class Blockchain {
     }
 
     //for chain replacement
-    replaceChain(chain) {
+    replaceChain(chain, onSucess) {
 
         //new chain MUST be longer than prev chain
         if (chain.length <= this.chain.length) {
@@ -36,6 +37,9 @@ class Blockchain {
             return;
         }
 
+        if (onSucess) {
+            onSucess();
+        }
         //if all above pass, then replace the chain
         console.log('replacing chain with', chain)
         this.chain = chain;
