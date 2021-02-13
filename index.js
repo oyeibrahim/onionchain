@@ -15,7 +15,7 @@ const app = express();
 const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
-const pubsub = new PubSub({ blockchain });
+const pubsub = new PubSub({ blockchain, transactionPool });
 
 const DEFAULT_PORT = 3000;
 const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
@@ -60,6 +60,8 @@ app.post('/api/transact', (req, res) => {
 
     transactionPool.setTransaction(transaction);
 
+    pubsub.broadcastTransaction(transaction);
+
     res.json({ type: 'success', transaction });
 });
 
@@ -71,7 +73,8 @@ app.get('/api/transaction-pool-map', (req, res) => {
 
 
 //SYNC any new node with root node
-const syncChains = () => {
+const syncWithRootState = () => {
+    //sync blocks
     axios.get(`${ROOT_NODE_ADDRESS}/api/blocks`)
         .then(function (body) {
             const rootChain = body.data;
@@ -79,6 +82,20 @@ const syncChains = () => {
             console.log('replace chain on a sync with', rootChain);
 
             blockchain.replaceChain(rootChain);
+
+        })
+        .catch(function (e) {
+            console.log("failed");
+        });
+
+    //sync trannsaction pool
+    axios.get(`${ROOT_NODE_ADDRESS}/api/transaction-pool-map`)
+        .then(function (body) {
+            const rootTransactionPoolMap = body.data;
+
+            console.log('replace transaction pool map on a sync with', rootTransactionPoolMap);
+
+            transactionPool.setMap(rootTransactionPoolMap);
 
         })
         .catch(function (e) {
@@ -107,6 +124,6 @@ app.listen(PORT, () => {
     //the main blockchain
     if (PORT !== DEFAULT_PORT) {
         //start chain SYNC
-        syncChains();
+        syncWithRootState();
     }
 })
