@@ -25,10 +25,12 @@ const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 app.use(bodyParser.json())
 
+//#-----------Block List-----------#//
 app.get('/api/blocks', (req, res) => {
     res.json(blockchain.chain);
 });
 
+//#-----------Mine Block-----------#//
 app.post('/api/mine', (req, res) => {
     const { data } = req.body;
 
@@ -40,6 +42,7 @@ app.post('/api/mine', (req, res) => {
     res.redirect('blocks');
 });
 
+//#-----------Create New Transaction-----------#//
 app.post('/api/transact', (req, res) => {
     const { amount, recipient } = req.body;
 
@@ -57,9 +60,12 @@ app.post('/api/transact', (req, res) => {
 
     transactionPool.setTransaction(transaction);
 
-    console.log('transaction', transactionPool);
-
     res.json({ type: 'success', transaction });
+});
+
+//#-----------Transaction Pool Map-----------#//
+app.get('/api/transaction-pool-map', (req, res) => {
+    res.json(transactionPool.transactionMap);
 });
 
 
