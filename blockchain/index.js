@@ -4,8 +4,10 @@
  */
 
 const Block = require('./block');
+const Transaction = require('../wallet/transaction');
 const { cryptoHash } = require('../util');
-const { on } = require('nodemon');
+const { REWARD_INPUT, MINING_REWARD } = require('../config');
+const Wallet = require('../wallet');
 
 class Blockchain {
     constructor() {
@@ -43,6 +45,70 @@ class Blockchain {
         //if all above pass, then replace the chain
         console.log('replacing chain with', chain)
         this.chain = chain;
+    }
+
+    //check if data in the chain is valid
+    validTransactionData({ chain }) {
+        for (let i = 0; i < chain.length; i++) {
+            const block = chain[i];
+
+            //to keep track so no duplicate transaction in a block
+            //Set() is a native JavaScript class that allows a set 
+            //of Unique items only unlike Array that can have non-unique
+            //items
+            const transactionSet = new Set();
+
+            let rewardTransactionCount = 0;
+
+            for (const transaction of block.data) {
+                if (transaction.input.address === REWARD_INPUT.address) {
+                    rewardTransactionCount += 1;
+
+                    if (rewardTransactionCount > 1) {
+                        console.error('Miner rewards exeed limit');
+                        return false;
+                    }
+
+                    //using Object.values to grab first transaction since 
+                    //we can't know the publicKey beforehand
+                    if (Object.values(transaction.outputMap)[0] !== MINING_REWARD) {
+                        console.error('Miner reward amount is invalid');
+                        return false;
+                    }
+                } else {
+                    if (!Transaction.validTransaction(transaction)) {
+                        console.error('Invalid Transaction');
+                        return false;
+                    }
+
+                    //make sure amount of the addresses is balance from
+                    //the existing accepted chain hence use of this.chain
+                    //and not @param chain.
+                    const trueBalance = Wallet.calculateBalance({
+                        chain: this.chain,
+                        address: transaction.input.address
+                    });
+
+                    if (transaction.input.amount !== trueBalance) {
+                        console.error('Invalid input amount');
+                        return false;
+                    }
+
+                    //check to ensure no duplicate transaction in the block
+                    //if it exist, return false
+                    //if it doesn't exist before then add it to the Set()
+                    if (transactionSet.has(transaction)) {
+                        console.error('An identical transaction appears more than once in the block');
+                        return false;
+                    } else {
+                        transactionSet.add(transaction);
+                    }
+
+                }
+            }
+        }
+
+        return true;
     }
 
     //check if a chain is valid
