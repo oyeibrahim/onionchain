@@ -32,7 +32,7 @@ app.get('/api/blocks', (req, res) => {
     res.json(blockchain.chain);
 });
 
-//#-----------Old Mine Block-----------#//
+//#-----------Test Mine Block-----------#//
 app.post('/api/mine', (req, res) => {
     const { data } = req.body;
 
@@ -76,12 +76,22 @@ app.get('/api/transaction-pool-map', (req, res) => {
     res.json(transactionPool.transactionMap);
 });
 
-//#-----------New Mine Transactions-----------#//
+//#-----------Mine Transactions-----------#//
 app.get('/api/mine-transactions', (req, res) => {
     transactionMiner.mineTransaction();
 
     //redirect to /api/blocks
     res.redirect('blocks');
+});
+
+//#-----------Wallet Info-----------#//
+app.get('/api/wallet-info', (req, res) => {
+    const address = wallet.publicKey;
+
+    res.json({
+        address,
+        balance: Wallet.calculateBalance({ chain: blockchain.chain, address })
+    });
 });
 
 
