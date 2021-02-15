@@ -3,6 +3,10 @@ const express = require('express');
 
 const axios = require('axios');
 
+//built-in //for getting the absolute path as used in
+//res.sendFile
+const path = require('path');
+
 const Blockchain = require('./blockchain');
 //pubsub
 const PubSub = require('./app/pubsub');
@@ -93,6 +97,21 @@ app.get('/api/wallet-info', (req, res) => {
         balance: Wallet.calculateBalance({ chain: blockchain.chain, address })
     });
 });
+
+
+//################################
+//CLIENT
+//################################
+// * means serve this when request is received for any 
+//endpoint that hasn't been defined before
+app.get('*', (req, res) => {
+    //__dirname is current directory path, built-in
+    //use path to get the absolute path since res.sendFile
+    //require an absolute path
+    res.sendFile(path.join(__dirname, './client/index.html'));
+});
+
+//################################
 
 
 
