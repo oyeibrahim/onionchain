@@ -28,8 +28,12 @@ const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 
 
-
+//for accepting request parameters
 app.use(bodyParser.json())
+//for serving any files (html, css e.tc) in the stated  
+//direcory since we are using res.sendFile for client
+app.use(express.static(path.join(__dirname, 'client/dist')));
+
 
 //#-----------Block List-----------#//
 app.get('/api/blocks', (req, res) => {
@@ -102,13 +106,14 @@ app.get('/api/wallet-info', (req, res) => {
 //################################
 //CLIENT
 //################################
+
 // * means serve this when request is received for any 
 //endpoint that hasn't been defined before
 app.get('*', (req, res) => {
     //__dirname is current directory path, built-in
     //use path to get the absolute path since res.sendFile
     //require an absolute path
-    res.sendFile(path.join(__dirname, './client/index.html'));
+    res.sendFile(path.join(__dirname, 'client/dist/index.html'));
 });
 
 //################################
