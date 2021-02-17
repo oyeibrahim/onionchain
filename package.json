@@ -6,11 +6,11 @@
   "scripts": {
     "test": "jest --watchAll",
     "start": "npm run build-client && node index.js",
-    "dev-n": "npm run dev-client & nodemon index.js",
+    "dev-n": "nodemon index.js | npm run dev-client",
     "dev": "npm run dev-client & npm run start-redis && nodemon index.js",
     "dev-peer": "cross-env GENERATE_PEER_PORT='true' nodemon index.js",
     "start-redis": "redis-server --deamonize yes",
-    "build-client": "npm run clean && parcel build client/src/index.html --out-dir client/dist",
+    "build-client": "parcel build client/src/index.html --out-dir client/dist",
     "dev-client": "npm run clean && parcel client/src/index.html --out-dir client/dist",
     "clean": "rmdir /s /q .cache client\\dist"
   },

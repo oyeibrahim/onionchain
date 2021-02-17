@@ -1,9 +1,8 @@
 import React from 'react'
 import { render } from 'react-dom'
+import App from './components/App';
 
 render(
-    <div>
-        Welcome to Onion Chain
-    </div>,
+    <App />,
     document.getElementById('root')
 );
