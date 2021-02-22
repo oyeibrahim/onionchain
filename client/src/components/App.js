@@ -3,8 +3,15 @@ import React, { Component } from 'react'
 class App extends Component {
 
     state = {
-        walletInfo: { address: 'onionxv6', balance: 9999 }
+        walletInfo: {}
     };
+
+    componentDidMount() {
+        fetch('http://localhost:3000/api/wallet-info')
+            .then(response => response.json()
+                .then(json => this.setState({ walletInfo: json }))
+            )
+    }
 
     render() {
 
@@ -12,7 +19,11 @@ class App extends Component {
 
         return (
             <div>
-                Welcome to Onion blockchain...
+                <div>
+                    Welcome to Onion blockchain...
+                </div>
+                <div>Address: {address}</div>
+                <div>Balance: {balance}</div>
             </div>
         )
     }
