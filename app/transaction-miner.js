@@ -12,7 +12,7 @@ class TransactionMiner {
         this.pubsub = pubsub;
     }
 
-    mineTransaction() {
+    mineTransactions() {
 
         //get valid transactions from pool
         const validTransactions = this.transactionPool.validTransactions();

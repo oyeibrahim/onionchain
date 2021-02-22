@@ -86,7 +86,7 @@ app.get('/api/transaction-pool-map', (req, res) => {
 
 //#-----------Mine Transactions-----------#//
 app.get('/api/mine-transactions', (req, res) => {
-    transactionMiner.mineTransaction();
+    transactionMiner.mineTransactions();
 
     //redirect to /api/blocks
     res.redirect('blocks');
@@ -151,6 +151,58 @@ const syncWithRootState = () => {
         });
 }
 
+//############## TEST
+//Create dummy wallets and transactions for testing
+const orangeWallet = new Wallet();
+const berryWallet = new Wallet();
+
+//helper method for making transactions between the dummy wallets
+const generateWalletTransaction = ({ wallet, recipient, amount }) => {
+    const transaction = wallet.createTransaction({
+        recipient, amount, chain: blockchain.chain
+    });
+
+    transactionPool.setTransaction(transaction);
+
+}
+
+//use the method above to make transactions
+//send 5 from the base wallet to orangeWallet
+const walletAction = () => generateWalletTransaction({
+    wallet, recipient: orangeWallet.publicKey, amount: 5
+})
+
+//send 10 from orangeWallet to berryWallet
+const orangeWalletAction = () => generateWalletTransaction({
+    wallet: orangeWallet, recipient: berryWallet.publicKey, amount: 10
+})
+
+//send 15 from berryWallet to the base wallet
+const berryWalletAction = () => generateWalletTransaction({
+    wallet: berryWallet, recipient: wallet.publicKey, amount: 15
+})
+
+//run above methods 10 times to create 10 different transactions
+//then mine them
+for (let i = 0; i < 10; i++) {
+
+    if (i % 3 === 0) {
+        walletAction();
+        orangeWalletAction();
+    } else if (i % 3 === 1) {
+        walletAction();
+        berryWalletAction();
+    } else {
+        orangeWalletAction();
+        berryWalletAction();
+    }
+
+    //mine the transactions
+    transactionMiner.mineTransactions();
+
+}
+
+//############## End TEST
 
 
 let PEER_PORT;
