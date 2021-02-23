@@ -28,3 +28,20 @@ body {
     padding: 5%;
     margin: 2%;
 }
+
+hr {
+    background-color: whitesmoke;
+}
+
+.Transaction {
+    padding: 5%;
+}
+
+.ConductTransaction, .TransactionPool {
+    margin: 10%;
+}
+
+a, a:hover {
+    color: rgb(197, 77, 77);
+    text-decoration: underline;
+}
