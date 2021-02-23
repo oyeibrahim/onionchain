@@ -14,17 +14,23 @@ const TransactionPool = require('./wallet/transaction-pool');
 const Wallet = require('./wallet');
 const TransactionMiner = require('./app/transaction-miner');
 
+//get if in development mode
+const isDevelopment = process.env.ENV === 'development';
 
+
+//if in development, use local redis else use heroku redis
+const REDIS_URL = isDevelopment ? 'redis://127.0.0.1:6379' :
+    'redis://:pc70ba4595b916fd5dc49eba555dd8d5af2d6ba74c3bf2676b9b8cf8dea42bf6e@ec2-52-3-18-175.compute-1.amazonaws.com:9269';
+
+const DEFAULT_PORT = 3000;
+const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 const app = express();
 const blockchain = new Blockchain();
 const transactionPool = new TransactionPool();
 const wallet = new Wallet();
-const pubsub = new PubSub({ blockchain, transactionPool });
+const pubsub = new PubSub({ blockchain, transactionPool, redisUrl: REDIS_URL });
 const transactionMiner = new TransactionMiner({ blockchain, transactionPool, wallet, pubsub });
-
-const DEFAULT_PORT = 3000;
-const ROOT_NODE_ADDRESS = `http://localhost:${DEFAULT_PORT}`;
 
 
 
@@ -151,54 +157,61 @@ const syncWithRootState = () => {
         });
 }
 
-//############## TEST
-//Create dummy wallets and transactions for testing
-const orangeWallet = new Wallet();
-const berryWallet = new Wallet();
 
-//helper method for making transactions between the dummy wallets
-const generateWalletTransaction = ({ wallet, recipient, amount }) => {
-    const transaction = wallet.createTransaction({
-        recipient, amount, chain: blockchain.chain
-    });
 
-    transactionPool.setTransaction(transaction);
+//############## TEST (development)
 
-}
+//do this only in development
+if (isDevelopment) {
+    //Create dummy wallets and transactions for testing
+    const orangeWallet = new Wallet();
+    const berryWallet = new Wallet();
 
-//use the method above to make transactions
-//send 5 from the base wallet to orangeWallet
-const walletAction = () => generateWalletTransaction({
-    wallet, recipient: orangeWallet.publicKey, amount: 5
-})
+    //helper method for making transactions between the dummy wallets
+    const generateWalletTransaction = ({ wallet, recipient, amount }) => {
+        const transaction = wallet.createTransaction({
+            recipient, amount, chain: blockchain.chain
+        });
 
-//send 10 from orangeWallet to berryWallet
-const orangeWalletAction = () => generateWalletTransaction({
-    wallet: orangeWallet, recipient: berryWallet.publicKey, amount: 10
-})
+        transactionPool.setTransaction(transaction);
 
-//send 15 from berryWallet to the base wallet
-const berryWalletAction = () => generateWalletTransaction({
-    wallet: berryWallet, recipient: wallet.publicKey, amount: 15
-})
-
-//run above methods 10 times to create 10 different transactions
-//then mine them
-for (let i = 0; i < 10; i++) {
-
-    if (i % 3 === 0) {
-        walletAction();
-        orangeWalletAction();
-    } else if (i % 3 === 1) {
-        walletAction();
-        berryWalletAction();
-    } else {
-        orangeWalletAction();
-        berryWalletAction();
     }
 
-    //mine the transactions
-    transactionMiner.mineTransactions();
+    //use the method above to make transactions
+    //send 5 from the base wallet to orangeWallet
+    const walletAction = () => generateWalletTransaction({
+        wallet, recipient: orangeWallet.publicKey, amount: 5
+    })
+
+    //send 10 from orangeWallet to berryWallet
+    const orangeWalletAction = () => generateWalletTransaction({
+        wallet: orangeWallet, recipient: berryWallet.publicKey, amount: 10
+    })
+
+    //send 15 from berryWallet to the base wallet
+    const berryWalletAction = () => generateWalletTransaction({
+        wallet: berryWallet, recipient: wallet.publicKey, amount: 15
+    })
+
+    //run above methods 10 times to create 10 different transactions
+    //then mine them
+    for (let i = 0; i < 10; i++) {
+
+        if (i % 3 === 0) {
+            walletAction();
+            orangeWalletAction();
+        } else if (i % 3 === 1) {
+            walletAction();
+            berryWalletAction();
+        } else {
+            orangeWalletAction();
+            berryWalletAction();
+        }
+
+        //mine the transactions
+        transactionMiner.mineTransactions();
+
+    }
 
 }
 
@@ -216,7 +229,7 @@ if (process.env.GENERATE_PEER_PORT === 'true') {
     PEER_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
 
-const PORT = PEER_PORT || DEFAULT_PORT;
+const PORT = process.env.PORT || PEER_PORT || DEFAULT_PORT;
 app.listen(PORT, () => {
     console.log(`listening at localhost:${PORT}`)
 
