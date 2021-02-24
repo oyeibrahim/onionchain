@@ -17,7 +17,7 @@
     "build-client-windows": "npm run clean-windows && parcel build client/src/index.html --out-dir client/dist",
     "dev-client": "npm run clean && parcel client/src/index.html --out-dir client/dist",
     "dev-client-windows": "npm run clean-windows && parcel client/src/index.html --out-dir client/dist",
-    "clean": "rm rf .cache client/dist",
+    "clean": "rm -rf .cache client/dist",
     "clean-windows": "rmdir /s /q .cache client\\dist"
   },
   "jest": {
