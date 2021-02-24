@@ -23,8 +23,8 @@ const REDIS_URL = isDevelopment ? 'redis://127.0.0.1:6379' :
     'redis://:pc70ba4595b916fd5dc49eba555dd8d5af2d6ba74c3bf2676b9b8cf8dea42bf6e@ec2-52-3-18-175.compute-1.amazonaws.com:9269';
 
 const DEFAULT_PORT = 3000;
-const ROOT_NODE_ADDRESS = isDevelopment ? 'https://onion-chain.herokuapp.com' :
-    `http://localhost:${DEFAULT_PORT}`;
+const ROOT_NODE_ADDRESS = isDevelopment ? `http://localhost:${DEFAULT_PORT}` :
+    'https://onion-chain.herokuapp.com';
 
 const app = express();
 const blockchain = new Blockchain();
