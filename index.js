@@ -141,6 +141,7 @@ const syncWithRootState = () => {
         })
         .catch(function (e) {
             console.log("failed");
+            console.log(e);
         });
 
     //sync trannsaction pool
