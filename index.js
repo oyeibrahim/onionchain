@@ -42,9 +42,37 @@ app.use(bodyParser.json())
 app.use(express.static(path.join(__dirname, 'client/dist')));
 
 
-//#-----------Block List-----------#//
+//#-----------List of all Blocks in the Blockchain-----------#//
 app.get('/api/blocks', (req, res) => {
     res.json(blockchain.chain);
+});
+
+//#-----------Displays lenghth of the Blockchain-----------#//
+app.get('/api/blocks/length', (req, res) => {
+    res.json(blockchain.chain.length);
+});
+
+//#-----------Paginated List of all Blocks in the Blockchain-----------#//
+app.get('/api/blocks/:pageNum', (req, res) => {
+    const { pageNum } = req.params;
+    const { length } = blockchain.chain;
+
+    //total to display on each page
+    const total = 5;
+
+    //create a reversed blockchain copy to get newer first
+    //slice() creates a copy, without param means copy the whole object
+    const blocksReversed = blockchain.chain.slice().reverse();
+
+    //do pagination calculation
+    let startIndex = (pageNum - 1) * total;
+    let endIndex = pageNum * total;
+
+    //ensure startIndex and endIndex is not greater than the blockchain length
+    startIndex = startIndex < length ? startIndex : length;
+    endIndex = endIndex < length ? endIndex : length;
+
+    res.json(blocksReversed.slice(startIndex, endIndex));
 });
 
 //#-----------Test Mine Block-----------#//
@@ -109,6 +137,23 @@ app.get('/api/wallet-info', (req, res) => {
     });
 });
 
+//#-----------Get all addresses in the network-----------#//
+app.get('/api/known-addresses', (req, res) => {
+    const addressMap = {}
+
+    for (let block of blockchain.chain) {
+        for (let transaction of block.data) {
+
+            const recipient = Object.keys(transaction.outputMap)
+
+            recipient.forEach(recipient => addressMap[recipient] = recipient);
+
+        }
+    }
+
+    res.json(Object.keys(addressMap));
+});
+
 
 //################################
 //CLIENT
@@ -141,7 +186,6 @@ const syncWithRootState = () => {
         })
         .catch(function (e) {
             console.log("failed");
-            console.log(e);
         });
 
     //sync trannsaction pool
